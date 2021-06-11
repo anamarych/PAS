@@ -32,6 +32,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String LOG_TAG = "WeatherApp";
     private static final String API_BASE_URL = "https://api.openweathermap.org/data/2.5";
+    private static final  String API_KEY = "";
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
@@ -137,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.i(LOG_TAG, "getCountryByName =" + countryName);
         countryResult.setText("");
 
-        Call<List<Weather>> call_async = apiService.getWeather(countryName, "8dedcc7198c51b7d7119a0c408ce01fd");
+        Call<List<Weather>> call_async = apiService.getWeather(countryName, API_KEY);
         call_async.enqueue(new Callback<List<Weather>>() {
 
             @Override
