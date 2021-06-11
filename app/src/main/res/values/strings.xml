@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Weather Compare</string>
+    <string name="logout_button">Log Out</string>
+    <string name="signed_in">Signed in!</string>
+    <string name="signed_out">Signed out!</string>
+    <string name="signed_cancelled">Signed in cancelled</string>
+    <string name="firebase_user_fmt">Firebase User: %s</string>
+    <string name="title_activity_location">Map</string>
+    <string name="logo">logo</string>
+    <string name="btncountry">btnCountry</string>
+    <string name="btnall">btnAll</string>
+    <string name="currentcity">Current City: %s</string>
+    <string name="strError">No cities found</string>
+</resources>
