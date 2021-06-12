@@ -1,104 +1,135 @@
 package com.etsisi.weathercompare;
 
-//API model
-import com.etsisi.weathercompare.models.Weather;
-
 //android
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 //firebase
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+
+//location
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseUser;
 
-//retrofit
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import android.location.Address;
+import android.location.Geocoder;
 
 //java
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String LOG_TAG = "WeatherApp";
-    private static final String API_BASE_URL = "https://api.openweathermap.org/data/2.5";
-    private static final  String API_KEY = "";
-
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
-    private TextView countryResult;
-    private EditText etCountryName;
-
-    private ICountryRESTAPIService apiService;
-
     private static final int RC_SIGN_IN = 2020;
+    private static final int LOCATION_REQ = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        findViewById(R.id.logoutButton).setOnClickListener(this);
-        countryResult = findViewById(R.id.countryResult);
-        etCountryName = findViewById(R.id.countryName);
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API_BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        apiService = retrofit.create(ICountryRESTAPIService.class);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
-
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // user is signed in
-                    CharSequence username = user.getDisplayName();
-                    Toast.makeText(MainActivity.this, getString(R.string.firebase_user_fmt, username), Toast.LENGTH_LONG).show();
-                    Log.i(LOG_TAG, "onAuthStateChanged() " + getString(R.string.firebase_user_fmt, username));
-                    ((TextView) findViewById(R.id.cityView)).setText(getString(R.string.currentcity, "Current"));
-
-                } else {
-                    // user is signed out
-                    startActivityForResult(
-                            AuthUI.getInstance()
-                                    .createSignInIntentBuilder()
-                                    .setAvailableProviders(Arrays.asList(
-                                            new AuthUI.IdpConfig.GoogleBuilder().build(),
-                                            new AuthUI.IdpConfig.EmailBuilder().build()))
-                                    .setIsSmartLockEnabled(!BuildConfig.DEBUG /* credentials */, true /* hints */)
-                                    .setLogo(R.drawable.map_point)
-                                    .build(),
-                            RC_SIGN_IN
-                    );
-                }
+        mAuthStateListener = firebaseAuth -> {
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            if (user != null) {
+                // user is signed in
+                CharSequence username = user.getDisplayName();
+                //Toast.makeText(this, getString(R.string.firebase_user_fmt, username), Toast.LENGTH_SHORT).show();
+                Log.i(LOG_TAG, "onAuthStateChanged() " + getString(R.string.firebase_user_fmt, username));
+                getLastLocation();
+            } else {
+                // user is signed out
+                startActivityForResult(
+                        AuthUI.getInstance()
+                                .createSignInIntentBuilder()
+                                .setAvailableProviders(Arrays.asList(
+                                        new AuthUI.IdpConfig.GoogleBuilder().build(),
+                                        new AuthUI.IdpConfig.EmailBuilder().build()))
+                                .setIsSmartLockEnabled(!BuildConfig.DEBUG /* credentials */, true /* hints */)
+                                .setLogo(R.drawable.map_point)
+                                .build(),
+                        RC_SIGN_IN
+                );
             }
         };
+        findViewById(R.id.logoutButton).setOnClickListener(this);
+        Log.i(LOG_TAG, "Main");
+    }
+
+
+    private void getLastLocation(){
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if ( ActivityCompat
+                .checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, location -> {
+                        if (location != null) {Geocoder gcd = new Geocoder(getApplicationContext(),Locale.getDefault());
+                            List<Address> addresses;
+                            try {
+                                addresses = gcd.getFromLocation(location.getLatitude(), location.getLongitude(),1);
+                                if (addresses.size() > 0) {
+                                    ((TextView) findViewById(R.id.cityView)).setText(getString(R.string.currentcity,addresses.get(0).getLocality()));
+                                }
+                            } catch (IOException e) {
+                                ((TextView) findViewById(R.id.cityView)).setText(getString(R.string.currentcity,"No City Found"));
+                                e.printStackTrace();
+                            }
+                        } else {
+                            ((TextView) findViewById(R.id.cityView)).setText(getString(R.string.currentcity,"Null"));
+                        }
+                    });
+
+/*            fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+                if (location != null) {
+
+                } else {
+                    ((TextView) findViewById(R.id.cityView)).setText(getString(R.string.currentcity,"Null"));
+                }
+            });*/
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                    },
+                    LOCATION_REQ);
+        }
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
-    }
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-    protected void onResume(){
-        super.onResume();
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        if (requestCode == LOCATION_REQ) {
+            for (int grantResult : grantResults) {
+                if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(MainActivity.this, "Permission Denied", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
 
     @Override
@@ -115,59 +146,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
-    /**
-     * Called when a view has been clicked.
-     *
-     * @param v The view that was clicked.
-     */
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+    }
+
+    protected void onResume(){
+        super.onResume();
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+    }
+
     @Override
     public void onClick(View v) {
         mFirebaseAuth.signOut();
         Log.i(LOG_TAG, getString(R.string.signed_out));
-    }
-
-    public void onClickMap(View v) {
-        //Open new activity
-        Intent activity2Intent = new Intent(getApplicationContext(), LocationActivity.class);
-        startActivity(activity2Intent);
-
-    }
-
-    public void getCountryByName(View v){
-        String countryName = etCountryName.getText().toString();
-        Log.i(LOG_TAG, "getCountryByName =" + countryName);
-        countryResult.setText("");
-
-        Call<List<Weather>> call_async = apiService.getWeather(countryName, API_KEY);
-        call_async.enqueue(new Callback<List<Weather>>() {
-
-            @Override
-            public void onResponse(Call<List<Weather>> call, Response<List<Weather>> response) {
-                List<Weather> countryList = response.body();
-                int contPais = 0;
-                if (null != countryList) {
-                    for (Weather country : countryList) {
-                        contPais++;
-                        countryResult.append(contPais+ " - ["+country.getDescription() + "] "+"\n\n");
-                    }
-                    Log.i(LOG_TAG, "getCountryByName => respuesta=" + countryList);
-                } else {
-                    countryResult.setText(getString(R.string.strError));
-                    Log.i(LOG_TAG, getString(R.string.strError));
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Weather>> call, Throwable t) {
-                Toast.makeText(
-                        getApplicationContext(),
-                        "ERROR: " + t.getMessage(),
-                        Toast.LENGTH_LONG
-                ).show();
-                Log.e(LOG_TAG, t.getMessage());
-            }
-
-
-        });
     }
 }
