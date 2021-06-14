@@ -8,7 +8,13 @@
     <string name="title_activity_location">Map</string>
     <string name="logo">logo</string>
     <string name="btncountry">btnCountry</string>
-    <string name="btnall">btnAll</string>
+    <string name="btnMap">btnMap</string>
     <string name="currentcity">Current City: %s</string>
     <string name="strError">No cities found</string>
+    <string name="no_results">No previous results</string>
+    <string name="temperature">Temperature: %s</string>
+    <string name="city">city</string>
+    <string name="humedad">Humedad: %s</string>
+    <string name="luz">Luz: %s</string>
+    <string name="presion">Presion: %s</string>
 </resources>
