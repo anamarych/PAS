@@ -84,4 +84,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
+
+    public void signOut() {
+        mFirebaseAuth.signOut();
+        Log.i(LOG_TAG, getString(R.string.signed_out));
+    }
 }

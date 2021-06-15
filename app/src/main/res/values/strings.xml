@@ -11,10 +11,16 @@
     <string name="btnMap">btnMap</string>
     <string name="currentcity">Current City: %s</string>
     <string name="strError">No cities found</string>
-    <string name="no_results">No previous results</string>
+    <string name="no_results">Cannot fetch results</string>
+    <string name="no_forecast">No forecast to show</string>
     <string name="temperature">Temperature: %s</string>
     <string name="city">city</string>
     <string name="humedad">Humedad: %s</string>
     <string name="luz">Luz: %s</string>
     <string name="presion">Presion: %s</string>
+    <string name="save">Save</string>
+    <string name="forecast">forecast</string>
+    <string name="temperature2">Temperature: %s C</string>
+    <string name="sensors">Sensors:</string>
+    <string name="current_data">Current Data:</string>
 </resources>

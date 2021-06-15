@@ -1,32 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingLeft="16dp"
-    android:paddingTop="16dp"
-    android:paddingEnd="16dp"
-    android:paddingRight="16dp"
     tools:context=".MainActivity">
-
-    <TextView
-        android:id="@+id/cityView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="16dp"
-        android:text="@string/currentcity"
-        android:textAllCaps="false"
-        android:textColor="#2196F3"
-        android:textSize="20sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#2F03A9F4"
-        android:orientation="horizontal"
-        android:paddingBottom="16dp">
+        android:orientation="vertical"
+        android:paddingLeft="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
+        android:paddingRight="16dp">
+
+        <TextView
+            android:id="@+id/cityView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp"
+            android:text="@string/currentcity"
+            android:textAllCaps="false"
+            android:textColor="#2196F3"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sensors"
+            android:textAllCaps="false" />
 
         <TextView
             android:id="@+id/maxPresion"
@@ -41,13 +45,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/luz" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#2F03A9F4"
-        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/maxTemp"
@@ -63,26 +60,24 @@
             android:layout_weight="1"
             android:text="@string/humedad" />
 
-    </LinearLayout>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#2F03A9F4"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp">
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/current_data"
+            android:textAllCaps="true"
+            android:paddingTop="16dp"/>
 
         <TextView
             android:id="@+id/mainCityResult"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/no_results" />
-    </ScrollView>
 
-    <androidx.constraintlayout.widget.Barrier
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:barrierDirection="top" />
+        <androidx.constraintlayout.widget.Barrier
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:barrierDirection="top" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -94,10 +89,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="6"
-            android:ems="10"
             android:importantForAutofill="no"
             android:inputType="text"
             android:paddingTop="16dp"
+            android:selectAllOnFocus="true"
             android:text="@string/city" />
 
         <ImageButton
@@ -114,29 +109,41 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:contentDescription="@string/forecast"
             android:onClick="getForecast"
             app:srcCompat="@android:drawable/ic_menu_more" />
 
     </LinearLayout>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp">
 
-        <TextView
-            android:id="@+id/cityResult"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/no_results" />
-    </ScrollView>
+            android:background="#4803A9F4"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:id="@+id/countryResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/no_forecast" />
+        </ScrollView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+    </androidx.recyclerview.widget.RecyclerView>
 
     <Button
         android:id="@+id/logoutButton"
         style="@android:style/Widget.DeviceDefault.Light.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="logOut"
         android:text="@string/logout_button" />
 
 </LinearLayout>
+</ScrollView>
